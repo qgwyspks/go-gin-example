@@ -1,9 +1,14 @@
-FROM golang:latest
+FROM golang:alpine AS builder
 
-ENV GOPROXY https://goproxy.cn,direct
-WORKDIR $GOPATH/src/github.com/qgwyspks/go-gin-example
-COPY . $GOPATH/src/github.com/qgwyspks/go-gin-example
-RUN go build .
+WORKDIR /build
+
+COPY . .
+RUN go build -o go-gin-example .
+
+FROM alpine
+
+WORKDIR /build
+COPY --from=builder /build/go-gin-example /build/go-gin-example
 
 EXPOSE 8000
-ENTRYPOINT ["./go-gin-example"]
+CMD ["./go-gin-example"]
